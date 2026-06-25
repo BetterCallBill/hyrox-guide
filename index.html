@@ -411,7 +411,7 @@
           '<div class="station-left" style="position:sticky;top:24px;">' +
           (s.videoFile ?
             '<div data-vidblock style="position:relative;width:100%;border:1px solid var(--border);overflow:hidden;background:#000;line-height:0;">' +
-            '<video src="' + esc(s.videoFile) + '" loop playsinline preload="metadata" style="width:100%;height:auto;display:block;"></video>' +
+            '<video data-src="' + esc(s.videoFile) + '" loop muted playsinline preload="none" style="width:100%;height:auto;display:block;"></video>' +
             videoControls() +
             '</div>'
             :
@@ -483,8 +483,37 @@
         return m + ":" + (s < 10 ? "0" : "") + s;
       }
 
+      // Lazy-load: only attach a real src when the video is near the viewport so
+      // we never have more than a couple decoding at once (iOS Safari caps the
+      // number of concurrently loaded videos and silently blocks the rest).
+      function loadVideo(video) {
+        if (!video) { return; }
+        if (!video.getAttribute("src") && video.getAttribute("data-src")) {
+          video.setAttribute("src", video.getAttribute("data-src"));
+          video.load();
+        }
+      }
+      function unloadVideo(video) {
+        if (!video || !video.getAttribute("src")) { return; }
+        if (!video.paused) { return; }
+        video.removeAttribute("src");
+        video.load();
+      }
+
       function setupVideos() {
         var blocks = document.querySelectorAll("[data-vidblock]");
+
+        var io = null;
+        if ("IntersectionObserver" in window) {
+          io = new IntersectionObserver(function (entries) {
+            Array.prototype.forEach.call(entries, function (entry) {
+              var v = entry.target.querySelector("video");
+              if (entry.isIntersecting) { loadVideo(v); }
+              else { unloadVideo(v); }
+            });
+          }, { rootMargin: "300px 0px" });
+        }
+
         Array.prototype.forEach.call(blocks, function (block) {
           var video = block.querySelector("video");
           var fill = block.querySelector("[data-fill]");
@@ -515,14 +544,12 @@
             if (fill) { fill.style.width = (d ? (video.currentTime / d * 100) : 0) + "%"; }
             if (time) { time.textContent = fmtTime(video.currentTime) + " / " + fmtTime(d); }
           }
-          // Prime the first frame: with preload="metadata" most browsers fetch
-          // metadata but never paint a frame, leaving the video black until play.
-          // Nudging currentTime forces a seek, which fetches and renders that frame.
-          var primed = false;
+          // Prime the first frame after (each) load: nudging currentTime forces a
+          // seek so a desktop browser paints a frame instead of a black box. Runs
+          // again whenever the video is re-loaded after scrolling back into view.
           video.addEventListener("loadedmetadata", function () {
             sync();
-            if (!primed) {
-              primed = true;
+            if (video.paused && video.currentTime < 0.1) {
               try { video.currentTime = 0.1; } catch (e) {}
             }
           });
@@ -538,6 +565,9 @@
             });
           }
           sync();
+
+          if (io) { io.observe(block); }
+          else { loadVideo(video); }
         });
       }
 
@@ -582,7 +612,13 @@
           var act = vbtn.getAttribute("data-vidaction");
           if (act === "back5") { video.currentTime = Math.max(0, video.currentTime - 5); }
           else if (act === "fwd5") { video.currentTime = Math.min(video.duration || 0, video.currentTime + 5); }
-          else if (act === "playpause") { if (video.paused) { video.play(); } else { video.pause(); } }
+          else if (act === "playpause") {
+            if (video.paused) {
+              loadVideo(video);
+              var p = video.play();
+              if (p && p.catch) { p.catch(function () {}); }
+            } else { video.pause(); }
+          }
           return;
         }
         var btn = e.target.closest("button[data-action]");
