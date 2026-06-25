@@ -1,401 +1,611 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hyrox Guide — Every Station, Decoded</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{margin:0;background:#fff;color:#000;font-family:'Inter','Noto Sans SC',system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
-  :root{
-    --bg:#ffffff;--surface:#f5f5f5;--card:#ffffff;
-    --border:#e5e5e5;--border-strong:#000000;
-    --text:#000000;--text-strong:#000000;--text-secondary:#666666;--text-muted:#999999;
-    --accent:#F5D000;--on-accent:#000000;
-    --ghost:#f0f0f0;--ph-bg:#f0f0f0;--ph-stripe:rgba(0,0,0,0.04);--ph-text:#999999;
-    --switch-bg:rgba(255,255,255,0.92);--switch-border:#e5e5e5;
-  }
-  [data-theme="dark"]{
-    --bg:#000000;--surface:#111111;--card:#0d0d0d;
-    --border:#262626;--border-strong:#ffffff;
-    --text:#ffffff;--text-strong:#ffffff;--text-secondary:#999999;--text-muted:#777777;
-    --accent:#F5D000;--on-accent:#000000;
-    --ghost:#161616;--ph-bg:#0f0f0f;--ph-stripe:rgba(255,255,255,0.05);--ph-text:#666666;
-    --switch-bg:rgba(17,17,17,0.92);--switch-border:#262626;
-  }
-  ::selection{background:#F5D000;color:#000;}
-  [data-lang="en"] [data-langbtn="en"],
-  [data-lang="zh"] [data-langbtn="zh"],
-  [data-theme="dark"] [data-themebtn="dark"],
-  [data-theme="light"] [data-themebtn="light"]{background:var(--accent)!important;color:var(--on-accent)!important;}
-  @media (max-width:860px){
-    .station-grid{grid-template-columns:minmax(0,1fr)!important;}
-    .station-left{position:static!important;}
-  }
-</style>
-</head>
-<body>
-<div id="app"></div>
-
-<script>
-(function(){
-  "use strict";
-
-  var state = { lang: "en", theme: "light" };
-
-  var COPY = {
-    en: {
-      guideKicker: "The first-timer's guide to Hyrox",
-      heroA: "Every station,", heroB: "decoded.",
-      heroSub: "Hyrox is eight 1 km runs, each followed by a functional workout station. No surprises on race day — here's exactly what each station is, how to do it right, and the rules that make a rep count.",
-      stat1: "Total running", stat2: "Stations", stat3: "Finish line",
-      formatKicker: "How the race flows",
-      formatA: "Run 1 km. Hit a station.", formatB: "Repeat", formatAccent: "eight times.",
-      formatSub: "Same order, same standards, every race. Scroll down to walk the full course — a run leads into each of the eight stations below.",
-      runLabel: "1 KM Run", intoStation: "into station", station: "Station",
-      lblRules: "The rules", lblPenalty: "Penalty Protocol", lblTips: "Tips", penaltyTag: "If you break it",
-      lblStandards: "Standards", lblMen: "Men's Open", lblWomen: "Women's Open",
-      finishKicker: "8 runs · 8 stations done", finishTitle: "Finish line.",
-      finishSub: "Cross it, and you're officially a Hyrox finisher. Now go learn the order by heart — knowing what's next is half the battle.",
-      footL: "First-timer's guide",
-      footR: "Weights shown are Open division · check current rulebook before race day",
-      dark: "Dark", light: "Light",
-    },
-    zh: {
-      guideKicker: "新手 Hyrox 全攻略",
-      heroA: "每个站点，", heroB: "全解析。",
-      heroSub: "Hyrox 由八段 1 公里跑组成，每段跑后接一个功能性训练站点。比赛日不再有意外——这里讲清每个站点是什么、如何做对，以及让每次动作有效的规则。",
-      stat1: "总跑步距离", stat2: "站点数", stat3: "终点线",
-      formatKicker: "比赛如何进行",
-      formatA: "跑 1 公里。完成一个站点。", formatB: "重复", formatAccent: "八次。",
-      formatSub: "每场比赛顺序相同、标准相同。向下滚动走完整个赛道——下方每个站点前都有一段跑步。",
-      runLabel: "1 公里跑", intoStation: "前往站点", station: "站点",
-      lblRules: "规则", lblPenalty: "判罚机制", lblTips: "技巧", penaltyTag: "违规后果",
-      lblStandards: "标准", lblMen: "男子公开组", lblWomen: "女子公开组",
-      finishKicker: "8 段跑 · 8 个站点完成", finishTitle: "终点线。",
-      finishSub: "冲过它，你就正式成为 Hyrox 完赛者。现在把顺序牢记于心——知道下一项是什么，就赢了一半。",
-      footL: "新手攻略",
-      footR: "所示重量为公开组 · 比赛前请核对最新规则手册",
-      dark: "深色", light: "浅色",
-    },
-  };
-
-  var RAW = {
-    en: [
-      { num:"01", name:"SkiErg", cat:"Machine", spec:"1000", specLabel:"Metres", ph:"photo: athlete on the SkiErg",
-        rules:["Complete the full 1000 m shown on the monitor.","Reset the monitor to zero before you start your effort."],
-        penalty:["No rep standard to fail — but the judge won't release you until the monitor reads the full 1000 m.","Leave the machine early and you're sent straight back to finish the distance."],
-        tips:["Drive the power from your hips and core, not just the arms.","Pull the handles down to your thighs in one smooth sweep.","Stand tall on the return and let the arms reach fully overhead."],
-        hasLoad:false, loadNote:"No load · 1000 m on the monitor" },
-      { num:"02", name:"Sled Push", cat:"Power", spec:"50", specLabel:"Metres", ph:"photo: low sled-push stance",
-        rules:["Push the sled the full 50 m (four lengths of the lane).","The entire sled must cross each turn line before you turn."],
-        penalty:["If the sled doesn't fully cross the turn line, the length doesn't count — keep pushing until it's over.","Turning or re-racking early means redoing that length."],
-        tips:["Stay low with arms extended and lean your bodyweight into the sled.","Drive through the balls of your feet in short, powerful steps.","Keep it moving — stopping kills your momentum and costs energy."],
-        hasLoad:true, load:{men:"152 kg",women:"102 kg"} },
-      { num:"03", name:"Sled Pull", cat:"Power", spec:"50", specLabel:"Metres", ph:"photo: hand-over-hand sled pull",
-        rules:["Pull the sled the full 50 m while staying inside the box.","Both the sled and rope handle must fully cross the line."],
-        penalty:["Step over the line or out of the box and the judge calls a no-rep.","Sled and rope handle must fully cross the line or the pull is repeated."],
-        tips:["Sit back into a low, athletic stance and pull hand-over-hand.","Use your bodyweight and legs to drive the pull, not just arms.","Reset your feet behind the line between each set of pulls."],
-        hasLoad:true, load:{men:"103 kg",women:"78 kg"} },
-      { num:"04", name:"Burpee Broad Jumps", cat:"Bodyweight", spec:"80", specLabel:"Metres", ph:"photo: burpee broad jump",
-        rules:["Chest and thighs must touch the floor on every rep.","Both feet leave and land together — jump forward, not just up."],
-        penalty:["No chest-to-floor or a stepped landing is a no-rep — that rep is repeated.","Reps that don't travel forward don't count toward the 80 m."],
-        tips:["Get your chest to the floor, then explode up into the jump.","Jump forward from where your hands landed — cover ground.","Settle into a steady, repeatable rhythm rather than sprinting."],
-        hasLoad:false, loadNote:"Bodyweight · 80 m of jumps" },
-      { num:"05", name:"Rowing", cat:"Machine", spec:"1000", specLabel:"Metres", ph:"photo: rowing erg",
-        rules:["Complete the full 1000 m shown on the monitor.","Stay strapped in and reset the monitor before you begin."],
-        penalty:["No movement standard — but you can't leave until the monitor shows the full 1000 m.","Unstrap and step off early and you're sent back to finish."],
-        tips:["Sequence the stroke: legs, then core, then arms — reverse on the way back.","Around 60% of your power should come from the leg drive.","Long, controlled strokes beat short frantic ones."],
-        hasLoad:false, loadNote:"No load · 1000 m on the monitor" },
-      { num:"06", name:"Farmers Carry", cat:"Grip & Carry", spec:"200", specLabel:"Metres", ph:"photo: farmers carry with kettlebells",
-        rules:["Carry both weights the full 200 m.","If you drop them, restart the carry from where they landed."],
-        penalty:["Drop the weights and you restart the carry from where they landed.","Setting them down to rest still counts as a drop — re-grip and continue."],
-        tips:["Brace your core, pull your shoulders back and keep your chest proud.","Grip hard and walk with purpose — minimise the number of stops.","Pick a fixed point ahead and march straight to it."],
-        hasLoad:true, load:{men:"2 × 24 kg",women:"2 × 16 kg"} },
-      { num:"07", name:"Sandbag Lunges", cat:"Legs", spec:"100", specLabel:"Metres", ph:"photo: sandbag walking lunge",
-        rules:["The trailing knee must touch the ground on every lunge.","Your front foot must be fully planted before you stand up."],
-        penalty:["Back knee doesn't touch the floor — no-rep, repeat the lunge.","Standing before the front foot is fully planted is a no-rep."],
-        tips:["Rest the sandbag high across your shoulders and upper back.","Let your back knee gently kiss the floor on every rep.","Drive up through the front heel and stay tall through the torso."],
-        hasLoad:true, load:{men:"20 kg",women:"10 kg"} },
-      { num:"08", name:"Wall Balls", cat:"Full Body", spec:"100", specLabel:"Reps", ph:"photo: wall ball throw to target",
-        rules:["Hit the target every rep — 3.0 m for men, 2.7 m for women.","Squat below parallel each rep or the rep doesn't count."],
-        penalty:["Miss the target and the rep doesn't count toward 100.","Not squatting below parallel is a no-rep — every miss adds reps."],
-        tips:["Drop into a full squat below parallel, then drive up and throw.","Aim for the centre of the target on every single rep.","Catch the ball straight into your next squat to keep a flow."],
-        hasLoad:true, load:{men:"6 kg → 3.0 m",women:"4 kg → 2.7 m"} },
-    ],
-    zh: [
-      { num:"01", name:"SkiErg", cat:"器械", spec:"1000", specLabel:"米", ph:"图片：运动员使用 SkiErg",
-        rules:["完成显示屏上的全程 1000 米。","开始用力前把显示屏归零。"],
-        penalty:["没有可判废的动作标准——但裁判会等显示屏到 1000 米才放行。","提前离开器械会被直接送回补足距离。"],
-        tips:["用髋部和核心发力，而不只是手臂。","顺势一气把手柄拉到大腿前侧。","回程时身体充分伸展，手臂完全举过头顶。"],
-        hasLoad:false, loadNote:"无负重 · 显示屏 1000 米" },
-      { num:"02", name:"Sled Push", cat:"力量", spec:"50", specLabel:"米", ph:"图片：低姿推雪橇",
-        rules:["把雪橇推满 50 米（赛道四个来回长度）。","转向前整个雪橇必须越过每条转向线。"],
-        penalty:["雪橇未完全越过转向线，该段不计——继续推到完全越过为止。","提前转向或归位需重做该段。"],
-        tips:["保持低姿、手臂伸直，用身体重量压向雪橇。","用前脚掌发力，短而有力地迈步。","保持移动——停下会失去惯性、消耗体力。"],
-        hasLoad:true, load:{men:"152 kg",women:"102 kg"} },
-      { num:"03", name:"Sled Pull", cat:"力量", spec:"50", specLabel:"米", ph:"图片：手递手拉雪橇",
-        rules:["把雪橇拉满 50 米，全程留在框内。","雪橇与绳柄都必须完全越过线。"],
-        penalty:["越线或踏出框外，裁判判废。","雪橇与绳柄必须完全越过线，否则该次重拉。"],
-        tips:["坐低成稳定的运动姿势，手递手拉绳。","用身体重量和腿部发力，而非只靠手臂。","每组拉动之间把脚重新放回线后。"],
-        hasLoad:true, load:{men:"103 kg",women:"78 kg"} },
-      { num:"04", name:"Burpee Broad Jumps", cat:"自重", spec:"80", specLabel:"米", ph:"图片：波比跳加立定跳",
-        rules:["每次动作胸部和大腿都必须触地。","双脚同时起跳同时落地——向前跳，而非只向上。"],
-        penalty:["胸部未触地或踏步落地判废——该次重做。","未向前移动的动作不计入 80 米。"],
-        tips:["胸部触地，然后爆发起身跳起。","从手所在的位置向前跳——多覆盖距离。","找到稳定可重复的节奏，别冲太快。"],
-        hasLoad:false, loadNote:"自重 · 80 米跳跃" },
-      { num:"05", name:"Rowing", cat:"器械", spec:"1000", specLabel:"米", ph:"图片：划船机",
-        rules:["完成显示屏上的全程 1000 米。","保持系好绑带，开始前将显示屏归零。"],
-        penalty:["没有动作标准——但显示屏未到 1000 米不能离开。","提前解带离机会被送回补足。"],
-        tips:["发力顺序：腿、核心、手臂——回程相反。","约 60% 的力量应来自腿部蹬伸。","长而受控的划桨胜过短促慌乱的划桨。"],
-        hasLoad:false, loadNote:"无负重 · 显示屏 1000 米" },
-      { num:"06", name:"Farmers Carry", cat:"握力与负重", spec:"200", specLabel:"米", ph:"图片：壶铃农夫行走",
-        rules:["把两个重物都搬满 200 米。","若掉落，从落下的位置重新开始。"],
-        penalty:["掉落重物需从落点重新开始搬运。","放下休息也算掉落——重新握紧继续。"],
-        tips:["收紧核心，肩膀后展，挺起胸膛。","握紧、坚定地走——尽量少停。","选一个前方固定点，径直走过去。"],
-        hasLoad:true, load:{men:"2 × 24 kg",women:"2 × 16 kg"} },
-      { num:"07", name:"Sandbag Lunges", cat:"腿部", spec:"100", specLabel:"米", ph:"图片：沙袋行进弓步",
-        rules:["每个弓步后膝都必须触地。","起身前前脚必须完全踩实。"],
-        penalty:["后膝未触地——判废，重做该弓步。","前脚未踩实就起身判废。"],
-        tips:["把沙袋高置于肩膀和上背部。","每次让后膝轻触地面。","用前脚跟发力起身，上身保持挺直。"],
-        hasLoad:true, load:{men:"20 kg",women:"10 kg"} },
-      { num:"08", name:"Wall Balls", cat:"全身", spec:"100", specLabel:"次", ph:"图片：抛球击打目标",
-        rules:["每次都要击中目标——男子 3.0 米，女子 2.7 米。","每次下蹲低于平行，否则不计数。"],
-        penalty:["未击中目标，该次不计入 100。","未蹲至低于平行判废——每次失误都要补做。"],
-        tips:["下蹲到低于平行，然后向上发力抛出。","每一次都瞄准目标中心。","接球后直接进入下一次下蹲，保持连贯。"],
-        hasLoad:true, load:{men:"6 kg → 3.0 m",women:"4 kg → 2.7 m"} },
-    ],
-  };
-
-  function esc(s){
-    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-  }
-
-  function controls(t){
-    return ''+
-    '<div style="position:fixed;top:18px;right:20px;z-index:50;display:flex;gap:8px;">'+
-      '<div data-lang="'+state.lang+'" style="display:flex;gap:3px;background:var(--switch-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--switch-border);padding:3px;">'+
-        '<button data-action="setEn" data-langbtn="en" style="border:none;font-family:\'Inter\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.1em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">EN</button>'+
-        '<button data-action="setZh" data-langbtn="zh" style="border:none;font-family:\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.04em;padding:9px 14px;cursor:pointer;background:transparent;color:var(--text-secondary);">中文</button>'+
-      '</div>'+
-      '<div data-theme="'+state.theme+'" style="display:flex;gap:3px;background:var(--switch-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--switch-border);padding:3px;">'+
-        '<button data-action="setLight" data-themebtn="light" style="border:none;font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.08em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">'+esc(t.light)+'</button>'+
-        '<button data-action="setDark" data-themebtn="dark" style="border:none;font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.08em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">'+esc(t.dark)+'</button>'+
-      '</div>'+
-    '</div>';
-  }
-
-  function hero(t){
-    return ''+
-    '<section style="border-bottom:1px solid var(--border);">'+
-      '<div style="max-width:1280px;margin:0 auto;padding:120px 40px 80px;">'+
-        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;">'+
-          '<span style="width:34px;height:9px;background:var(--accent);display:inline-block;"></span>'+
-          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-secondary);">'+esc(t.guideKicker)+'</span>'+
-        '</div>'+
-        '<h1 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(60px,11vw,150px);line-height:0.86;letter-spacing:-0.005em;text-transform:uppercase;margin:0;color:var(--text-strong);">'+esc(t.heroA)+'<br><span style="color:var(--accent);">'+esc(t.heroB)+'</span></h1>'+
-        '<p style="max-width:640px;font-size:clamp(17px,2vw,20px);line-height:1.55;color:var(--text-secondary);margin:32px 0 0;">'+esc(t.heroSub)+'</p>'+
-        '<div style="display:flex;flex-wrap:wrap;gap:0;margin-top:56px;border:1px solid var(--border);">'+
-          '<div style="flex:1;min-width:180px;padding:30px 32px;border-right:1px solid var(--border);">'+
-            '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">8<span style="color:var(--accent);">KM</span></div>'+
-            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">'+esc(t.stat1)+'</div>'+
-          '</div>'+
-          '<div style="flex:1;min-width:180px;padding:30px 32px;border-right:1px solid var(--border);">'+
-            '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">8</div>'+
-            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">'+esc(t.stat2)+'</div>'+
-          '</div>'+
-          '<div style="flex:1;min-width:180px;padding:30px 32px;">'+
-            '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">1</div>'+
-            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">'+esc(t.stat3)+'</div>'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-    '</section>';
-  }
-
-  function overview(t, stations){
-    var cards = stations.map(function(s){
-      return ''+
-      '<a href="#station-'+esc(s.num)+'" style="display:flex;align-items:center;gap:18px;padding:24px 26px;background:var(--card);text-decoration:none;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">'+
-        '<span style="font-family:\'Anton\',sans-serif;font-size:36px;line-height:1;color:var(--text-strong);min-width:48px;">'+esc(s.num)+'</span>'+
-        '<span style="display:flex;flex-direction:column;">'+
-          '<span style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:0.005em;color:var(--text-strong);">'+esc(s.name)+'</span>'+
-          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-top:5px;">'+esc(s.cat)+'</span>'+
-        '</span>'+
-      '</a>';
-    }).join('');
-
-    return ''+
-    '<section style="border-bottom:1px solid var(--border);background:var(--surface);">'+
-      '<div style="max-width:1280px;margin:0 auto;padding:88px 40px;">'+
-        '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:20px;">'+esc(t.formatKicker)+'</div>'+
-        '<h2 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(36px,6vw,78px);line-height:0.94;text-transform:uppercase;margin:0 0 18px;color:var(--text-strong);">'+esc(t.formatA)+'<br>'+esc(t.formatB)+' <span style="color:var(--accent);">'+esc(t.formatAccent)+'</span></h2>'+
-        '<p style="max-width:640px;font-size:17px;line-height:1.55;color:var(--text-secondary);margin:0 0 46px;">'+esc(t.formatSub)+'</p>'+
-        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0;border:1px solid var(--border);">'+cards+'</div>'+
-      '</div>'+
-    '</section>';
-  }
-
-  function runDivider(t, num){
-    return ''+
-    '<div style="background:#0a0a0a;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">'+
-      '<div style="max-width:1280px;margin:0 auto;padding:22px 40px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">'+
-        '<div style="display:flex;align-items:center;gap:18px;">'+
-          '<span style="font-family:\'Anton\',sans-serif;font-size:clamp(14px,2vw,16px);letter-spacing:0.2em;color:#F5D000;">&rarr;</span>'+
-          '<span style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-size:clamp(22px,3.4vw,34px);text-transform:uppercase;letter-spacing:0.03em;color:#ffffff;">'+esc(t.runLabel)+'</span>'+
-          '<span style="flex:1;height:1px;min-width:30px;background:repeating-linear-gradient(90deg,#2c2c2c 0 12px,transparent 12px 22px);display:inline-block;"></span>'+
-        '</div>'+
-        '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:600;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#888888;">'+esc(t.intoStation)+' '+esc(num)+'</span>'+
-      '</div>'+
-    '</div>';
-  }
-
-  function listItems(items, markerHtml){
-    return items.map(function(it){
-      return ''+
-      '<li style="display:flex;gap:15px;align-items:flex-start;">'+
-        markerHtml(it)+
-        '<span style="font-size:16px;line-height:1.5;color:var(--text);">'+esc(it.text !== undefined ? it.text : it)+'</span>'+
-      '</li>';
-    }).join('');
-  }
-
-  function station(t, s){
-    var loadCells = '';
-    if(s.hasLoad){
-      loadCells = ''+
-      '<div style="flex:1;padding:18px 22px;border-left:1px solid var(--border);">'+
-        '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">'+esc(t.lblMen)+'</div>'+
-        '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(26px,3vw,34px);line-height:1;color:var(--text-strong);">'+esc(s.load.men)+'</div>'+
-      '</div>'+
-      '<div style="flex:1;padding:18px 22px;border-left:1px solid var(--border);">'+
-        '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">'+esc(t.lblWomen)+'</div>'+
-        '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(26px,3vw,34px);line-height:1;color:var(--text-strong);">'+esc(s.load.women)+'</div>'+
-      '</div>';
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hyrox Guide — Every Station, Decoded</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    var rules = s.rules.map(function(text, i){ return { n: String(i+1), text: text }; });
+    html {
+      scroll-behavior: smooth;
+    }
 
-    var rulesHtml = listItems(rules, function(r){
-      return '<span style="font-family:\'Anton\',sans-serif;font-size:15px;color:var(--text-muted);margin-top:1px;flex-shrink:0;min-width:14px;">'+esc(r.n)+'</span>';
-    });
-    var penaltyHtml = listItems(s.penalty, function(){
-      return '<span style="width:8px;height:8px;border:2px solid var(--accent);margin-top:6px;flex-shrink:0;"></span>';
-    });
-    var tipsHtml = listItems(s.tips, function(){
-      return '<span style="width:9px;height:9px;background:var(--accent);margin-top:7px;flex-shrink:0;"></span>';
-    });
+    body {
+      margin: 0;
+      background: #fff;
+      color: #000;
+      font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
 
-    return ''+
-    '<section id="station-'+esc(s.num)+'" style="position:relative;border-bottom:1px solid var(--border);overflow:hidden;background:var(--bg);">'+
-      '<div style="position:absolute;top:-6%;right:-1%;font-family:\'Anton\',sans-serif;font-size:clamp(190px,34vw,470px);line-height:0.8;color:var(--ghost);pointer-events:none;user-select:none;z-index:0;">'+esc(s.num)+'</div>'+
-      '<div class="station-grid" style="position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:76px 40px 84px;display:grid;grid-template-columns:minmax(0,0.84fr) minmax(0,1.16fr);gap:56px;align-items:start;">'+
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --card: #ffffff;
+      --border: #e5e5e5;
+      --border-strong: #000000;
+      --text: #000000;
+      --text-strong: #000000;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --accent: #F5D000;
+      --on-accent: #000000;
+      --ghost: #f0f0f0;
+      --ph-bg: #f0f0f0;
+      --ph-stripe: rgba(0, 0, 0, 0.04);
+      --ph-text: #999999;
+      --switch-bg: rgba(255, 255, 255, 0.92);
+      --switch-border: #e5e5e5;
+    }
 
-        '<div class="station-left" style="position:sticky;top:24px;">'+
-          '<div style="aspect-ratio:4/5;width:100%;border:1px solid var(--border);background-color:var(--ph-bg);background-image:repeating-linear-gradient(135deg,var(--ph-stripe) 0 11px,transparent 11px 22px);display:flex;align-items:center;justify-content:center;">'+
-            '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:600;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ph-text);text-align:center;padding:0 22px;">'+esc(s.ph)+'</span>'+
-          '</div>'+
-          '<div style="display:flex;border:1px solid var(--border);border-top:none;background:var(--card);">'+
-            '<div style="flex:1;padding:18px 22px;">'+
-              '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">'+esc(s.specLabel)+'</div>'+
-              '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(26px,3vw,34px);line-height:1;color:var(--text-strong);">'+esc(s.spec)+'</div>'+
-            '</div>'+
-            loadCells+
-          '</div>'+
-        '</div>'+
+    [data-theme="dark"] {
+      --bg: #000000;
+      --surface: #111111;
+      --card: #0d0d0d;
+      --border: #262626;
+      --border-strong: #ffffff;
+      --text: #ffffff;
+      --text-strong: #ffffff;
+      --text-secondary: #999999;
+      --text-muted: #777777;
+      --accent: #F5D000;
+      --on-accent: #000000;
+      --ghost: #161616;
+      --ph-bg: #0f0f0f;
+      --ph-stripe: rgba(255, 255, 255, 0.05);
+      --ph-text: #666666;
+      --switch-bg: rgba(17, 17, 17, 0.92);
+      --switch-border: #262626;
+    }
 
-        '<div>'+
-          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:14px;">'+esc(t.station)+' '+esc(s.num)+' &mdash; '+esc(s.cat)+'</div>'+
-          '<h3 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(44px,7vw,88px);line-height:0.9;text-transform:uppercase;letter-spacing:-0.005em;margin:0 0 38px;color:var(--text-strong);">'+esc(s.name)+'</h3>'+
+    ::selection {
+      background: #F5D000;
+      color: #000;
+    }
 
-          '<div style="margin-bottom:38px;">'+
-            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-strong);border-bottom:2px solid var(--border-strong);padding-bottom:11px;margin-bottom:20px;">'+esc(t.lblRules)+'</div>'+
-            '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px;">'+rulesHtml+'</ul>'+
-          '</div>'+
+    [data-lang="en"] [data-langbtn="en"],
+    [data-lang="zh"] [data-langbtn="zh"],
+    [data-theme="dark"] [data-themebtn="dark"],
+    [data-theme="light"] [data-themebtn="light"] {
+      background: var(--accent) !important;
+      color: var(--on-accent) !important;
+    }
 
-          '<div style="margin-bottom:38px;">'+
-            '<div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--border-strong);padding-bottom:11px;margin-bottom:20px;">'+
-              '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-strong);">'+esc(t.lblPenalty)+'</span>'+
-              '<span style="font-family:\'Inter\',sans-serif;font-weight:800;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#000;background:var(--accent);padding:3px 8px;">'+esc(t.penaltyTag)+'</span>'+
-            '</div>'+
-            '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px;">'+penaltyHtml+'</ul>'+
-          '</div>'+
+    @media (max-width:860px) {
+      .station-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
 
-          '<div>'+
-            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-strong);border-bottom:2px solid var(--border-strong);padding-bottom:11px;margin-bottom:20px;">'+esc(t.lblTips)+'</div>'+
-            '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px;">'+tipsHtml+'</ul>'+
-          '</div>'+
+      .station-left {
+        position: static !important;
+      }
+    }
+  </style>
+</head>
 
-        '</div>'+
-      '</div>'+
-    '</section>';
-  }
+<body>
+  <div id="app"></div>
+  <button id="toTop" aria-label="Back to top"
+    style="position:fixed;right:24px;bottom:24px;width:52px;height:52px;border:1px solid var(--border-strong);background:var(--accent);color:var(--on-accent);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:50;opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="square">
+      <path d="M12 19V5M5 12l7-7 7 7" />
+    </svg>
+  </button>
 
-  function finish(t){
-    return ''+
-    '<section style="background:#F5D000;color:#000;">'+
-      '<div style="max-width:1280px;margin:0 auto;padding:96px 40px;text-align:center;">'+
-        '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.24em;text-transform:uppercase;color:#000;opacity:0.65;margin-bottom:22px;">'+esc(t.finishKicker)+'</div>'+
-        '<h2 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(58px,12vw,160px);line-height:0.84;text-transform:uppercase;margin:0;color:#000;">'+esc(t.finishTitle)+'</h2>'+
-        '<p style="max-width:540px;margin:28px auto 0;font-size:18px;line-height:1.55;color:#1a1a1a;font-weight:500;">'+esc(t.finishSub)+'</p>'+
-      '</div>'+
-    '</section>';
-  }
+  <script>
+    (function () {
+      "use strict";
 
-  function footer(t){
-    return ''+
-    '<footer style="background:var(--surface);border-top:1px solid var(--border);">'+
-      '<div style="max-width:1280px;margin:0 auto;padding:32px 40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">'+
-        '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);">'+esc(t.footL)+'</span>'+
-        '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);">'+esc(t.footR)+'</span>'+
-      '</div>'+
-    '</footer>';
-  }
+      var state = { lang: "en", theme: "light" };
 
-  function render(){
-    var t = COPY[state.lang];
-    var stations = RAW[state.lang];
+      // Videos are served from Cloudflare R2 (public dev URL).
+      var VIDEO_BASE = "https://pub-624b079756ec4407976ac94842a3e765.r2.dev";
 
-    var stationsHtml = stations.map(function(s){
-      return runDivider(t, s.num) + station(t, s);
-    }).join('');
+      var COPY = {
+        en: {
+          guideKicker: "The first-timer's guide to Hyrox",
+          heroA: "Every station,", heroB: "decoded.",
+          heroSub: "Hyrox is eight 1 km runs, each followed by a functional workout station. No surprises on race day — here's exactly what each station is, how to do it right, and the rules that make a rep count.",
+          stat1: "Total running", stat2: "Stations", stat3: "Finish line",
+          formatKicker: "How the race flows",
+          formatA: "Run 1 km. Hit a station.", formatB: "Repeat", formatAccent: "eight times.",
+          formatSub: "Same order, same standards, every race. Scroll down to walk the full course — a run leads into each of the eight stations below.",
+          runLabel: "1 KM Run", intoStation: "into station", station: "Station",
+          lblRules: "The rules", lblPenalty: "Penalty Protocol", lblTips: "Tips", penaltyTag: "If you break it",
+          lblStandards: "Standards", lblMen: "Men's Open", lblWomen: "Women's Open",
+          finishKicker: "8 runs · 8 stations done", finishTitle: "Finish line.",
+          finishSub: "Cross it, and you're officially a Hyrox finisher. Now go learn the order by heart — knowing what's next is half the battle.",
+          footL: "First-timer's guide",
+          footR: "Weights shown are Open division · check current rulebook before race day",
+          dark: "Dark", light: "Light",
+        },
+        zh: {
+          guideKicker: "新手 Hyrox 全攻略",
+          heroA: "每个站点，", heroB: "全解析。",
+          heroSub: "Hyrox 由八段 1 公里跑组成，每段跑后接一个功能性训练站点。比赛日不再有意外——这里讲清每个站点是什么、如何做对，以及让每次动作有效的规则。",
+          stat1: "总跑步距离", stat2: "站点数", stat3: "终点线",
+          formatKicker: "比赛如何进行",
+          formatA: "跑 1 公里。完成一个站点。", formatB: "重复", formatAccent: "八次。",
+          formatSub: "每场比赛顺序相同、标准相同。向下滚动走完整个赛道——下方每个站点前都有一段跑步。",
+          runLabel: "1 公里跑", intoStation: "前往站点", station: "站点",
+          lblRules: "规则", lblPenalty: "判罚机制", lblTips: "技巧", penaltyTag: "违规后果",
+          lblStandards: "标准", lblMen: "男子公开组", lblWomen: "女子公开组",
+          finishKicker: "8 段跑 · 8 个站点完成", finishTitle: "终点线。",
+          finishSub: "冲过它，你就正式成为 Hyrox 完赛者。现在把顺序牢记于心——知道下一项是什么，就赢了一半。",
+          footL: "新手攻略",
+          footR: "所示重量为公开组 · 比赛前请核对最新规则手册",
+          dark: "深色", light: "浅色",
+        },
+      };
 
-    var html = ''+
-      controls(t)+
-      hero(t)+
-      overview(t, stations)+
-      stationsHtml+
-      finish(t)+
-      footer(t);
+      var RAW = {
+        en: [
+          {
+            num: "01", name: "SkiErg", cat: "Machine", spec: "1000", specLabel: "Metres", ph: "photo: athlete on the SkiErg", videoFile: VIDEO_BASE + "/1-skierg.mp4",
+            rules: ["Judge resets the monitor before starting.", "Both feet must remain on the SkiErg platform throughout the exercise.", "Heels may hang over the platform edge but must not touch the floor.", "Upon reaching 1,000 m, remain on the platform and raise one arm.", "Leave only after receiving judge confirmation."],
+            penalty: ["First infringement: Warning.", "Second infringement: 15-second penalty.", "Each subsequent infringement: Additional 15-second penalty.", "Leaving before completing 1,000 m may result in a time penalty or disqualification."],
+            tips: ["Drive the power from your hips and core, not just the arms.", "Pull the handles down to your thighs in one smooth sweep.", "Stand tall on the return and let the arms reach fully overhead."],
+            hasLoad: false, loadNote: "No load · 1000 m on the monitor"
+          },
+          {
+            num: "02", name: "Sled Push", cat: "Power", spec: "50", specLabel: "Metres", ph: "photo: low sled-push stance", videoFile: VIDEO_BASE + "/2-sled-push.mp4",
+            rules: ["Use only the assigned lane.", "Racer and sled must start completely behind the white line.", "Remain within the designated lane at all times.", "The sled must fully cross each 12.5 m line before changing direction.", "Complete all four lengths.", "Station is complete when the sled fully crosses the final line."],
+            penalty: ["First infringement: Warning.", "Second infringement: 15-second penalty.", "Each additional infringement: Additional 15-second penalty.", "Missing lane: 3-minute penalty per lane."],
+            tips: ["Stay low with arms extended and lean your bodyweight into the sled.", "Drive through the balls of your feet in short, powerful steps.", "Keep it moving — stopping kills your momentum and costs energy."],
+            hasLoad: true, load: { men: "152 kg", women: "102 kg" }
+          },
+          {
+            num: "03", name: "Sled Pull", cat: "Power", spec: "50", specLabel: "Metres", ph: "photo: hand-over-hand sled pull", videoFile: VIDEO_BASE + "/3-sled-pull.mp4",
+            rules: ["Use the assigned lane.", "Start inside the designated Racer's Box.", "Remain within the Racer's Box while pulling.", "Do not step on front or rear boundary lines.", "Sled must completely cross each 12.5 m line before changing direction.", "Remain standing throughout the movement.", "Seated or kneeling pulls are not permitted.", "Rope must stay within the assigned lane.", "Complete all four lengths."],
+            penalty: ["First infringement: Warning.", "Second infringement: 15-second penalty.", "Each additional infringement: Additional 15-second penalty.", "Missing lane: 3-minute penalty per lane."],
+            tips: ["Sit back into a low, athletic stance and pull hand-over-hand.", "Use your bodyweight and legs to drive the pull, not just arms.", "Reset your feet behind the line between each set of pulls."],
+            hasLoad: true, load: { men: "103 kg", women: "78 kg" }
+          },
+          {
+            num: "04", name: "Burpee Broad Jumps", cat: "Bodyweight", spec: "80", specLabel: "Metres", ph: "photo: burpee broad jump", videoFile: VIDEO_BASE + "/4-burpee.mp4",
+            rules: ["Begin each rep with a burpee.", "Chest must clearly touch the floor.", "Hands must start behind the designated line.", "Broad jumps require both feet to take off and land in parallel.", "No staggered feet, shuffles, or extra steps.", "Feet may not move beyond fingertips when exiting the burpee.", "For subsequent burpees, hands must be placed within 30 cm of the toes.", "Chest must touch the floor on every repetition.", "Both feet must fully cross each turning line before changing direction.", "Both feet must fully cross the finish line to complete the station."],
+            penalty: ["First infringement: Warning.", "Second infringement: 15-second penalty.", "Each additional infringement: Additional 15-second penalty."],
+            tips: ["Get your chest to the floor, then explode up into the jump.", "Jump forward from where your hands landed — cover ground.", "Settle into a steady, repeatable rhythm rather than sprinting."],
+            hasLoad: false, loadNote: "Bodyweight · 80 m of jumps"
+          },
+          {
+            num: "05", name: "Rowing", cat: "Machine", spec: "1000", specLabel: "Metres", ph: "photo: rowing erg", videoFile: VIDEO_BASE + "/5-rowing.mp4",
+            rules: ["Judge resets the monitor before starting.", "Feet must remain secured on the footplates.", "Athlete must remain seated while rowing.", "After reaching 1,000 m, remain seated and raise one arm.", "Leave only after judge confirmation."],
+            penalty: ["First infringement: Warning.", "Second infringement: 15-second penalty.", "Each additional infringement: Additional 15-second penalty.", "Leaving before reaching 1,000 m may result in a time penalty or disqualification."],
+            tips: ["Sequence the stroke: legs, then core, then arms — reverse on the way back.", "Around 60% of your power should come from the leg drive.", "Long, controlled strokes beat short frantic ones."],
+            hasLoad: false, loadNote: "No load · 1000 m on the monitor"
+          },
+          {
+            num: "06", name: "Farmers Carry", cat: "Grip & Carry", spec: "200", specLabel: "Metres", ph: "photo: farmers carry with kettlebells", videoFile: VIDEO_BASE + "/6-farmers-carry.mp4",
+            rules: ["Pick up kettlebells from the designated box.", "Carry both kettlebells at all times.", "Arms must remain extended by the sides.", "Resting is allowed.", "Kettlebells may not be moved forward when placed down.", "Finish by crossing the line and returning kettlebells upright to the correct box."],
+            penalty: ["Missing lap: 3-minute penalty per lap.", "Failure to return kettlebells correctly: 30-second penalty.", "Using the wrong weight: the entire station must be repeated with the correct weight — failure to repeat results in disqualification."],
+            tips: ["Brace your core, pull your shoulders back and keep your chest proud.", "Grip hard and walk with purpose — minimise the number of stops.", "Pick a fixed point ahead and march straight to it."],
+            hasLoad: true, load: { men: "2 × 24 kg", women: "2 × 16 kg" }
+          },
+          {
+            num: "07", name: "Sandbag Lunges", cat: "Legs", spec: "100", specLabel: "Metres", ph: "photo: sandbag walking lunge", videoFile: VIDEO_BASE + "/7-sandbag-lunges.mp4",
+            rules: ["Begin with both feet behind the start line.", "Front foot must lunge across the line.", "Rear knee must clearly touch the ground every repetition.", "Finish each rep standing tall with hips and knees fully extended.", "Lunges must alternate legs.", "No steps or shuffles between reps.", "Front foot must completely cross lane-end lines.", "Restart each section behind the line.", "Complete the station by crossing the finish line and returning the sandbag."],
+            penalty: ["First infringement: Warning.", "Second infringement: 15-second penalty.", "Failure to return sandbag correctly: 30-second penalty.", "Using the wrong weight: the entire station must be repeated — failure to repeat results in disqualification.", "Dropping the sandbag: 15-second penalty on the first occurrence, disqualification on the second — no warning is given."],
+            tips: ["Rest the sandbag high across your shoulders and upper back.", "Let your back knee gently kiss the floor on every rep.", "Drive up through the front heel and stay tall through the torso."],
+            hasLoad: true, load: { men: "20 kg", women: "10 kg" }
+          },
+          {
+            num: "08", name: "Wall Balls", cat: "Full Body", spec: "100", specLabel: "Reps", ph: "photo: wall ball throw to target", videoFile: VIDEO_BASE + "/8-wall-balls.mp4",
+            rules: ["Select the correct wall ball weight.", "Start each rep standing tall.", "Squat below parallel.", "Throw the ball with both hands.", "Ball must strike the correct target.", "Hips must descend below knee level.", "Every valid throw counts as one rep.", "If the ball drops, reset by standing tall before the next rep.", "Catching the ball after a bounce and continuing directly is not permitted.", "Complete 100 valid repetitions."],
+            penalty: ["No warnings are issued.", "Invalid repetitions are recorded as No Reps.", "Each missing rep incurs a 15-second penalty.", "Using powdered chalk results in a 2-minute penalty.", "Leaving the station before 100 valid reps: 15-second penalty per missing rep."],
+            tips: ["Drop into a full squat below parallel, then drive up and throw.", "Aim for the centre of the target on every single rep.", "Catch the ball straight into your next squat to keep a flow."],
+            hasLoad: true, load: { men: "6 kg → 3.0 m", women: "4 kg → 2.7 m" }
+          },
+        ],
+        zh: [
+          {
+            num: "01", name: "SkiErg", cat: "器械", spec: "1000", specLabel: "米", ph: "图片：运动员使用 SkiErg", videoFile: VIDEO_BASE + "/1-skierg.mp4",
+            rules: ["裁判在开始前将显示屏归零。", "整个动作过程中双脚必须留在 SkiErg 踏板上。", "脚跟可悬在踏板边缘外，但不得触地。", "到达 1000 米后，留在踏板上并举起一只手臂。", "得到裁判确认后方可离开。"],
+            penalty: ["第一次违规：警告。", "第二次违规：罚时 15 秒。", "此后每次违规：再罚时 15 秒。", "未完成 1000 米提前离开，可能被罚时或取消资格。"],
+            tips: ["用髋部和核心发力，而不只是手臂。", "顺势一气把手柄拉到大腿前侧。", "回程时身体充分伸展，手臂完全举过头顶。"],
+            hasLoad: false, loadNote: "无负重 · 显示屏 1000 米"
+          },
+          {
+            num: "02", name: "Sled Push", cat: "力量", spec: "50", specLabel: "米", ph: "图片：低姿推雪橇", videoFile: VIDEO_BASE + "/2-sled-push.mp4",
+            rules: ["只能使用指定赛道。", "选手与雪橇必须完全起步于白线之后。", "全程保持在指定赛道内。", "转向前雪橇必须完全越过每条 12.5 米线。", "完成全部四段。", "雪橇完全越过最后一条线即完成该站。"],
+            penalty: ["第一次违规：警告。", "第二次违规：罚时 15 秒。", "此后每次违规：再罚时 15 秒。", "漏做赛道：每条赛道罚时 3 分钟。"],
+            tips: ["保持低姿、手臂伸直，用身体重量压向雪橇。", "用前脚掌发力，短而有力地迈步。", "保持移动——停下会失去惯性、消耗体力。"],
+            hasLoad: true, load: { men: "152 kg", women: "102 kg" }
+          },
+          {
+            num: "03", name: "Sled Pull", cat: "力量", spec: "50", specLabel: "米", ph: "图片：手递手拉雪橇", videoFile: VIDEO_BASE + "/3-sled-pull.mp4",
+            rules: ["使用指定赛道。", "在指定的选手框内起步。", "拉动时保持在选手框内。", "不得踩到前后边界线。", "转向前雪橇必须完全越过每条 12.5 米线。", "全程保持站立。", "不允许坐姿或跪姿拉动。", "绳索必须留在指定赛道内。", "完成全部四段。"],
+            penalty: ["第一次违规：警告。", "第二次违规：罚时 15 秒。", "此后每次违规：再罚时 15 秒。", "漏做赛道：每条赛道罚时 3 分钟。"],
+            tips: ["坐低成稳定的运动姿势，手递手拉绳。", "用身体重量和腿部发力，而非只靠手臂。", "每组拉动之间把脚重新放回线后。"],
+            hasLoad: true, load: { men: "103 kg", women: "78 kg" }
+          },
+          {
+            num: "04", name: "Burpee Broad Jumps", cat: "自重", spec: "80", specLabel: "米", ph: "图片：波比跳加立定跳", videoFile: VIDEO_BASE + "/4-burpee.mp4",
+            rules: ["每次动作以波比跳开始。", "胸部必须明显触地。", "双手必须起始于指定线之后。", "立定跳要求双脚平行起跳和落地。", "不得交错站位、拖步或多余步伐。", "退出波比跳时双脚不得超过指尖。", "后续波比跳，双手必须放在脚趾 30 厘米范围内。", "每次动作胸部都必须触地。", "转向前双脚必须完全越过每条转向线。", "双脚必须完全越过终点线才算完成该站。"],
+            penalty: ["第一次违规：警告。", "第二次违规：罚时 15 秒。", "此后每次违规：再罚时 15 秒。"],
+            tips: ["胸部触地，然后爆发起身跳起。", "从手所在的位置向前跳——多覆盖距离。", "找到稳定可重复的节奏，别冲太快。"],
+            hasLoad: false, loadNote: "自重 · 80 米跳跃"
+          },
+          {
+            num: "05", name: "Rowing", cat: "器械", spec: "1000", specLabel: "米", ph: "图片：划船机", videoFile: VIDEO_BASE + "/5-rowing.mp4",
+            rules: ["裁判在开始前将显示屏归零。", "双脚必须固定在踏板上。", "划船时必须保持坐姿。", "到达 1000 米后，保持坐姿并举起一只手臂。", "得到裁判确认后方可离开。"],
+            penalty: ["第一次违规：警告。", "第二次违规：罚时 15 秒。", "此后每次违规：再罚时 15 秒。", "未到 1000 米提前离开，可能被罚时或取消资格。"],
+            tips: ["发力顺序：腿、核心、手臂——回程相反。", "约 60% 的力量应来自腿部蹬伸。", "长而受控的划桨胜过短促慌乱的划桨。"],
+            hasLoad: false, loadNote: "无负重 · 显示屏 1000 米"
+          },
+          {
+            num: "06", name: "Farmers Carry", cat: "握力与负重", spec: "200", specLabel: "米", ph: "图片：壶铃农夫行走", videoFile: VIDEO_BASE + "/6-farmers-carry.mp4",
+            rules: ["从指定箱中拿起壶铃。", "全程搬运两个壶铃。", "手臂必须在身体两侧保持伸展。", "允许休息。", "放下壶铃时不得向前移动。", "越过终点线并将壶铃竖直放回正确的箱中即完成。"],
+            penalty: ["漏圈：每圈罚时 3 分钟。", "未正确放回壶铃：罚时 30 秒。", "使用错误重量：必须用正确重量重做整站；不重做则取消资格。"],
+            tips: ["收紧核心，肩膀后展，挺起胸膛。", "握紧、坚定地走——尽量少停。", "选一个前方固定点，径直走过去。"],
+            hasLoad: true, load: { men: "2 × 24 kg", women: "2 × 16 kg" }
+          },
+          {
+            num: "07", name: "Sandbag Lunges", cat: "腿部", spec: "100", specLabel: "米", ph: "图片：沙袋行进弓步", videoFile: VIDEO_BASE + "/7-sandbag-lunges.mp4",
+            rules: ["双脚起始于起跑线之后。", "前脚必须跨过线弓步。", "每次后膝必须明显触地。", "每次结束时挺身站立，髋与膝完全伸展。", "弓步必须左右腿交替。", "两次动作间不得有步伐或拖步。", "前脚必须完全越过赛道端线。", "每段在线后重新开始。", "越过终点线并归还沙袋即完成该站。"],
+            penalty: ["第一次违规：警告。", "第二次违规：罚时 15 秒。", "未正确归还沙袋：罚时 30 秒。", "使用错误重量：必须重做整站；不重做则取消资格。", "掉落沙袋：第一次罚时 15 秒，第二次取消资格；不予警告。"],
+            tips: ["把沙袋高置于肩膀和上背部。", "每次让后膝轻触地面。", "用前脚跟发力起身，上身保持挺直。"],
+            hasLoad: true, load: { men: "20 kg", women: "10 kg" }
+          },
+          {
+            num: "08", name: "Wall Balls", cat: "全身", spec: "100", specLabel: "次", ph: "图片：抛球击打目标", videoFile: VIDEO_BASE + "/8-wall-balls.mp4",
+            rules: ["选择正确的药球重量。", "每次以挺身站立开始。", "下蹲至低于平行。", "双手抛球。", "球必须击中正确目标。", "髋部必须降至低于膝盖。", "每次有效抛球计为一次。", "若球掉落，下一次前需挺身站立重置。", "不允许接住反弹球后直接继续。", "完成 100 次有效动作。"],
+            penalty: ["不予警告。", "无效动作记为 No Reps（不计次）。", "每漏一次罚时 15 秒。", "使用粉状镁粉罚时 2 分钟。", "未完成 100 次有效动作离站：每漏一次罚时 15 秒。"],
+            tips: ["下蹲到低于平行，然后向上发力抛出。", "每一次都瞄准目标中心。", "接球后直接进入下一次下蹲，保持连贯。"],
+            hasLoad: true, load: { men: "6 kg → 3.0 m", women: "4 kg → 2.7 m" }
+          },
+        ],
+      };
 
-    var app = document.getElementById("app");
-    app.setAttribute("data-theme", state.theme);
-    app.setAttribute("data-lang", state.lang);
-    app.style.cssText = "background:var(--bg);width:100%;min-height:100vh;overflow:hidden;";
-    app.innerHTML = html;
-    document.documentElement.lang = state.lang === "zh" ? "zh" : "en";
-  }
+      function esc(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
 
-  var ACTIONS = {
-    setEn:    function(){ state.lang = "en"; },
-    setZh:    function(){ state.lang = "zh"; },
-    setLight: function(){ state.theme = "light"; },
-    setDark:  function(){ state.theme = "dark"; },
-  };
+      function controls(t) {
+        return '' +
+          '<div style="position:fixed;top:18px;right:20px;z-index:50;display:flex;gap:8px;">' +
+          '<div data-lang="' + state.lang + '" style="display:flex;gap:3px;background:var(--switch-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--switch-border);padding:3px;">' +
+          '<button data-action="setEn" data-langbtn="en" style="border:none;font-family:\'Inter\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.1em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">EN</button>' +
+          '<button data-action="setZh" data-langbtn="zh" style="border:none;font-family:\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.04em;padding:9px 14px;cursor:pointer;background:transparent;color:var(--text-secondary);">中文</button>' +
+          '</div>' +
+          '<div data-theme="' + state.theme + '" style="display:flex;gap:3px;background:var(--switch-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--switch-border);padding:3px;">' +
+          '<button data-action="setLight" data-themebtn="light" style="border:none;font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.08em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">' + esc(t.light) + '</button>' +
+          '<button data-action="setDark" data-themebtn="dark" style="border:none;font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.08em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">' + esc(t.dark) + '</button>' +
+          '</div>' +
+          '</div>';
+      }
 
-  document.getElementById("app").addEventListener("click", function(e){
-    var btn = e.target.closest("button[data-action]");
-    if(!btn) return;
-    var action = ACTIONS[btn.getAttribute("data-action")];
-    if(action){ action(); render(); }
-  });
+      function hero(t) {
+        return '' +
+          '<section style="border-bottom:1px solid var(--border);">' +
+          '<div style="max-width:1280px;margin:0 auto;padding:120px 40px 80px;">' +
+          '<div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;">' +
+          '<span style="width:34px;height:9px;background:var(--accent);display:inline-block;"></span>' +
+          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-secondary);">' + esc(t.guideKicker) + '</span>' +
+          '</div>' +
+          '<h1 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(60px,11vw,150px);line-height:0.86;letter-spacing:-0.005em;text-transform:uppercase;margin:0;color:var(--text-strong);">' + esc(t.heroA) + '<br><span style="color:var(--accent);">' + esc(t.heroB) + '</span></h1>' +
+          '<p style="max-width:640px;font-size:clamp(17px,2vw,20px);line-height:1.55;color:var(--text-secondary);margin:32px 0 0;">' + esc(t.heroSub) + '</p>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:0;margin-top:56px;border:1px solid var(--border);">' +
+          '<div style="flex:1;min-width:180px;padding:30px 32px;border-right:1px solid var(--border);">' +
+          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">8<span style="color:var(--accent);">KM</span></div>' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">' + esc(t.stat1) + '</div>' +
+          '</div>' +
+          '<div style="flex:1;min-width:180px;padding:30px 32px;border-right:1px solid var(--border);">' +
+          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">8</div>' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">' + esc(t.stat2) + '</div>' +
+          '</div>' +
+          '<div style="flex:1;min-width:180px;padding:30px 32px;">' +
+          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">1</div>' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">' + esc(t.stat3) + '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</section>';
+      }
 
-  render();
-})();
-</script>
+      function overview(t, stations) {
+        var cards = stations.map(function (s) {
+          return '' +
+            '<a href="#station-' + esc(s.num) + '" style="display:flex;align-items:center;gap:18px;padding:24px 26px;background:var(--card);text-decoration:none;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">' +
+            '<span style="font-family:\'Anton\',sans-serif;font-size:36px;line-height:1;color:var(--text-strong);min-width:48px;">' + esc(s.num) + '</span>' +
+            '<span style="display:flex;flex-direction:column;">' +
+            '<span style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:0.005em;color:var(--text-strong);">' + esc(s.name) + '</span>' +
+            '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-top:5px;">' + esc(s.cat) + '</span>' +
+            '</span>' +
+            '</a>';
+        }).join('');
+
+        return '' +
+          '<section style="border-bottom:1px solid var(--border);background:var(--surface);">' +
+          '<div style="max-width:1280px;margin:0 auto;padding:88px 40px;">' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:20px;">' + esc(t.formatKicker) + '</div>' +
+          '<h2 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(36px,6vw,78px);line-height:0.94;text-transform:uppercase;margin:0 0 18px;color:var(--text-strong);">' + esc(t.formatA) + '<br>' + esc(t.formatB) + ' <span style="color:var(--accent);">' + esc(t.formatAccent) + '</span></h2>' +
+          '<p style="max-width:640px;font-size:17px;line-height:1.55;color:var(--text-secondary);margin:0 0 46px;">' + esc(t.formatSub) + '</p>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0;border:1px solid var(--border);">' + cards + '</div>' +
+          '</div>' +
+          '</section>';
+      }
+
+      function runDivider(t, num) {
+        return '' +
+          '<div style="background:#0a0a0a;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">' +
+          '<div style="max-width:1280px;margin:0 auto;padding:22px 40px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">' +
+          '<div style="display:flex;align-items:center;gap:18px;">' +
+          '<span style="font-family:\'Anton\',sans-serif;font-size:clamp(14px,2vw,16px);letter-spacing:0.2em;color:#F5D000;">&rarr;</span>' +
+          '<span style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-size:clamp(22px,3.4vw,34px);text-transform:uppercase;letter-spacing:0.03em;color:#ffffff;">' + esc(t.runLabel) + '</span>' +
+          '<span style="flex:1;height:1px;min-width:30px;background:repeating-linear-gradient(90deg,#2c2c2c 0 12px,transparent 12px 22px);display:inline-block;"></span>' +
+          '</div>' +
+          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:600;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#888888;">' + esc(t.intoStation) + ' ' + esc(num) + '</span>' +
+          '</div>' +
+          '</div>';
+      }
+
+      function listItems(items, markerHtml) {
+        return items.map(function (it) {
+          return '' +
+            '<li style="display:flex;gap:15px;align-items:flex-start;">' +
+            markerHtml(it) +
+            '<span style="font-size:16px;line-height:1.5;color:var(--text);">' + esc(it.text !== undefined ? it.text : it) + '</span>' +
+            '</li>';
+        }).join('');
+      }
+
+      var ICON_PLAY = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      var ICON_PAUSE = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+      var ICON_REWIND = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12.5" y="15.7" font-size="9" font-weight="700" fill="currentColor" stroke="none" text-anchor="middle" font-family="Inter,Arial,sans-serif">5</text></svg>';
+      var ICON_FORWARD = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/><text x="11.5" y="15.7" font-size="9" font-weight="700" fill="currentColor" stroke="none" text-anchor="middle" font-family="Inter,Arial,sans-serif">5</text></svg>';
+
+      function cbtn(action, label, icon, size) {
+        return '<button data-vidaction="' + action + '" aria-label="' + label + '" style="border:none;background:rgba(0,0,0,0.38);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);color:#fff;width:' + size + 'px;height:' + size + 'px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .2s ease;">' + icon + '</button>';
+      }
+
+      function videoControls() {
+        return '' +
+          '<div data-overlay style="position:absolute;inset:0;opacity:1;transition:opacity .4s ease;pointer-events:none;">' +
+          '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:20px;pointer-events:auto;">' +
+          cbtn('back5', 'Rewind 5 seconds', ICON_REWIND, 48) +
+          cbtn('playpause', 'Play or pause', ICON_PLAY, 60) +
+          cbtn('fwd5', 'Forward 5 seconds', ICON_FORWARD, 48) +
+          '</div>' +
+          '<div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;padding: 20px 14px 20px;pointer-events: auto;background-color: black;ck;">' +
+          '<div data-progress style="position:relative;flex:1;height:11px;background:#fff;cursor:pointer;">' +
+          '<div data-fill style="position:absolute;left:0;top:0;bottom:0;width:0;background:#F5D000;"></div>' +
+          '</div>' +
+          '<span data-time style="font-family:\'Inter\',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.03em;color:#fff;white-space:nowrap;min-width:78px;text-align:right;font-variant-numeric:tabular-nums;text-shadow:0 1px 3px rgba(0,0,0,0.6);">0:00 / 0:00</span>' +
+          '</div>' +
+          '</div>';
+      }
+
+      function station(t, s) {
+        var loadCells = '';
+        if (s.hasLoad) {
+          loadCells = '' +
+            '<div style="flex:1;padding:18px 22px;border-left:1px solid var(--border);">' +
+            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">' + esc(t.lblMen) + '</div>' +
+            '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(22px,2.5vw,32px);line-height:1;color:var(--text-strong);white-space:nowrap;">' + esc(s.load.men) + '</div>' +
+            '</div>' +
+            '<div style="flex:1;padding:18px 22px;border-left:1px solid var(--border);">' +
+            '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">' + esc(t.lblWomen) + '</div>' +
+            '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(22px,2.5vw,32px);line-height:1;color:var(--text-strong);white-space:nowrap;">' + esc(s.load.women) + '</div>' +
+            '</div>';
+        }
+
+        var rules = s.rules.map(function (text, i) { return { n: String(i + 1), text: text }; });
+
+        var rulesHtml = listItems(rules, function (r) {
+          return '<span style="font-family:\'Anton\',sans-serif;font-size:15px;color:var(--text-muted);margin-top:1px;flex-shrink:0;min-width:14px;">' + esc(r.n) + '</span>';
+        });
+        var penaltyHtml = listItems(s.penalty, function () {
+          return '<span style="width:8px;height:8px;border:2px solid var(--accent);margin-top:6px;flex-shrink:0;"></span>';
+        });
+        var tipsHtml = listItems(s.tips, function () {
+          return '<span style="width:9px;height:9px;background:var(--accent);margin-top:7px;flex-shrink:0;"></span>';
+        });
+
+        return '' +
+          '<section id="station-' + esc(s.num) + '" style="position:relative;border-bottom:1px solid var(--border);overflow:hidden;background:var(--bg);">' +
+          '<div style="position:absolute;top:-6%;right:-1%;font-family:\'Anton\',sans-serif;font-size:clamp(190px,34vw,470px);line-height:0.8;color:var(--ghost);pointer-events:none;user-select:none;z-index:0;">' + esc(s.num) + '</div>' +
+          '<div class="station-grid" style="position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:76px 40px 84px;display:grid;grid-template-columns:minmax(0,0.84fr) minmax(0,1.16fr);gap:56px;align-items:start;">' +
+
+          '<div class="station-left" style="position:sticky;top:24px;">' +
+          (s.videoFile ?
+            '<div data-vidblock style="position:relative;width:100%;border:1px solid var(--border);overflow:hidden;background:#000;line-height:0;">' +
+            '<video src="' + esc(s.videoFile) + '#t=0.1" loop playsinline preload="metadata" style="width:100%;height:auto;display:block;"></video>' +
+            videoControls() +
+            '</div>'
+            :
+            '<div style="aspect-ratio:4/5;width:100%;border:1px solid var(--border);background-color:var(--ph-bg);background-image:repeating-linear-gradient(135deg,var(--ph-stripe) 0 11px,transparent 11px 22px);display:flex;align-items:center;justify-content:center;">' +
+            '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:600;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ph-text);text-align:center;padding:0 22px;">' + esc(s.ph) + '</span>' +
+            '</div>'
+          ) +
+          '<div style="display:flex;border:1px solid var(--border);border-top:none;background:var(--card);">' +
+          '<div style="flex:0.58;padding:18px 18px;">' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">' + esc(s.specLabel) + '</div>' +
+          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(22px,2.5vw,32px);line-height:1;color:var(--text-strong);white-space:nowrap;">' + esc(s.spec) + '</div>' +
+          '</div>' +
+          loadCells +
+          '</div>' +
+          '</div>' +
+
+          '<div>' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:14px;">' + esc(t.station) + ' ' + esc(s.num) + ' &mdash; ' + esc(s.cat) + '</div>' +
+          '<h3 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(44px,7vw,88px);line-height:0.9;text-transform:uppercase;letter-spacing:-0.005em;margin:0 0 38px;color:var(--text-strong);">' + esc(s.name) + '</h3>' +
+
+          '<div style="margin-bottom:38px;">' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-strong);border-bottom:2px solid var(--border-strong);padding-bottom:11px;margin-bottom:20px;">' + esc(t.lblRules) + '</div>' +
+          '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px;">' + rulesHtml + '</ul>' +
+          '</div>' +
+
+          '<div style="margin-bottom:38px;">' +
+          '<div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--border-strong);padding-bottom:11px;margin-bottom:20px;">' +
+          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-strong);">' + esc(t.lblPenalty) + '</span>' +
+          '<span style="font-family:\'Inter\',sans-serif;font-weight:800;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#000;background:var(--accent);padding:3px 8px;">' + esc(t.penaltyTag) + '</span>' +
+          '</div>' +
+          '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px;">' + penaltyHtml + '</ul>' +
+          '</div>' +
+
+          '<div>' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-strong);border-bottom:2px solid var(--border-strong);padding-bottom:11px;margin-bottom:20px;">' + esc(t.lblTips) + '</div>' +
+          '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px;">' + tipsHtml + '</ul>' +
+          '</div>' +
+
+          '</div>' +
+          '</div>' +
+          '</section>';
+      }
+
+      function finish(t) {
+        return '' +
+          '<section style="background:#F5D000;color:#000;">' +
+          '<div style="max-width:1280px;margin:0 auto;padding:96px 40px;text-align:center;">' +
+          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.24em;text-transform:uppercase;color:#000;opacity:0.65;margin-bottom:22px;">' + esc(t.finishKicker) + '</div>' +
+          '<h2 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(58px,12vw,160px);line-height:0.84;text-transform:uppercase;margin:0;color:#000;">' + esc(t.finishTitle) + '</h2>' +
+          '<p style="max-width:540px;margin:28px auto 0;font-size:18px;line-height:1.55;color:#1a1a1a;font-weight:500;">' + esc(t.finishSub) + '</p>' +
+          '</div>' +
+          '</section>';
+      }
+
+      function footer(t) {
+        return '' +
+          '<footer style="background:var(--surface);border-top:1px solid var(--border);">' +
+          '<div style="max-width:1280px;margin:0 auto;padding:32px 40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
+          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);">' + esc(t.footL) + '</span>' +
+          '<span style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);">' + esc(t.footR) + '</span>' +
+          '</div>' +
+          '</footer>';
+      }
+
+      function fmtTime(sec) {
+        if (!isFinite(sec) || sec < 0) { sec = 0; }
+        var m = Math.floor(sec / 60);
+        var s = Math.floor(sec % 60);
+        return m + ":" + (s < 10 ? "0" : "") + s;
+      }
+
+      function setupVideos() {
+        var blocks = document.querySelectorAll("[data-vidblock]");
+        Array.prototype.forEach.call(blocks, function (block) {
+          var video = block.querySelector("video");
+          var fill = block.querySelector("[data-fill]");
+          var track = block.querySelector("[data-progress]");
+          var time = block.querySelector("[data-time]");
+          var toggle = block.querySelector('[data-vidaction="playpause"]');
+          var overlay = block.querySelector("[data-overlay]");
+          if (!video) return;
+
+          var hideTimer;
+          function showControls() {
+            if (overlay) { overlay.style.opacity = "1"; }
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(function () { if (overlay) { overlay.style.opacity = "0"; } }, 1000);
+          }
+          function hideControls() {
+            clearTimeout(hideTimer);
+            if (overlay) { overlay.style.opacity = "0"; }
+          }
+          block.addEventListener("mousemove", showControls);
+          block.addEventListener("mouseenter", showControls);
+          block.addEventListener("touchstart", showControls, { passive: true });
+          block.addEventListener("mouseleave", hideControls);
+          showControls();
+
+          function sync() {
+            var d = video.duration || 0;
+            if (fill) { fill.style.width = (d ? (video.currentTime / d * 100) : 0) + "%"; }
+            if (time) { time.textContent = fmtTime(video.currentTime) + " / " + fmtTime(d); }
+          }
+          video.addEventListener("loadedmetadata", sync);
+          video.addEventListener("timeupdate", sync);
+          video.addEventListener("play", function () { if (toggle) { toggle.innerHTML = ICON_PAUSE; } });
+          video.addEventListener("pause", function () { if (toggle) { toggle.innerHTML = ICON_PLAY; } });
+
+          if (track) {
+            track.addEventListener("click", function (e) {
+              var r = track.getBoundingClientRect();
+              var d = video.duration || 0;
+              if (d) { video.currentTime = Math.min(d, Math.max(0, (e.clientX - r.left) / r.width * d)); }
+            });
+          }
+          sync();
+        });
+      }
+
+      function render() {
+        var t = COPY[state.lang];
+        var stations = RAW[state.lang];
+
+        var stationsHtml = stations.map(function (s) {
+          return runDivider(t, s.num) + station(t, s);
+        }).join('');
+
+        var html = '' +
+          controls(t) +
+          hero(t) +
+          overview(t, stations) +
+          stationsHtml +
+          finish(t) +
+          footer(t);
+
+        var app = document.getElementById("app");
+        app.setAttribute("data-theme", state.theme);
+        app.setAttribute("data-lang", state.lang);
+        app.style.cssText = "background:var(--bg);width:100%;min-height:100vh;overflow:hidden;";
+        app.innerHTML = html;
+        document.documentElement.lang = state.lang === "zh" ? "zh" : "en";
+        setupVideos();
+      }
+
+      var ACTIONS = {
+        setEn: function () { state.lang = "en"; },
+        setZh: function () { state.lang = "zh"; },
+        setLight: function () { state.theme = "light"; },
+        setDark: function () { state.theme = "dark"; },
+      };
+
+      document.getElementById("app").addEventListener("click", function (e) {
+        var vbtn = e.target.closest("button[data-vidaction]");
+        if (vbtn) {
+          var block = vbtn.closest("[data-vidblock]");
+          var video = block && block.querySelector("video");
+          if (!video) return;
+          var act = vbtn.getAttribute("data-vidaction");
+          if (act === "back5") { video.currentTime = Math.max(0, video.currentTime - 5); }
+          else if (act === "fwd5") { video.currentTime = Math.min(video.duration || 0, video.currentTime + 5); }
+          else if (act === "playpause") { if (video.paused) { video.play(); } else { video.pause(); } }
+          return;
+        }
+        var btn = e.target.closest("button[data-action]");
+        if (!btn) return;
+        var action = ACTIONS[btn.getAttribute("data-action")];
+        if (action) { action(); render(); }
+      });
+
+      var toTop = document.getElementById("toTop");
+      toTop.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      function updateToTop() {
+        var show = window.scrollY > 400;
+        toTop.style.opacity = show ? "1" : "0";
+        toTop.style.visibility = show ? "visible" : "hidden";
+      }
+      window.addEventListener("scroll", updateToTop, { passive: true });
+      updateToTop();
+
+      render();
+    })();
+  </script>
 </body>
+
 </html>
