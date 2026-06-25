@@ -107,7 +107,7 @@
     (function () {
       "use strict";
 
-      var state = { lang: "en", theme: "light" };
+      var state = { lang: "en", theme: "dark" };
 
       // Videos are served from Cloudflare R2 (public dev URL).
       var VIDEO_BASE = "https://pub-624b079756ec4407976ac94842a3e765.r2.dev";
@@ -205,7 +205,7 @@
             rules: ["Select the correct wall ball weight.", "Start each rep standing tall.", "Squat below parallel.", "Throw the ball with both hands.", "Ball must strike the correct target.", "Hips must descend below knee level.", "Every valid throw counts as one rep.", "If the ball drops, reset by standing tall before the next rep.", "Catching the ball after a bounce and continuing directly is not permitted.", "Complete 100 valid repetitions."],
             penalty: ["No warnings are issued.", "Invalid repetitions are recorded as No Reps.", "Each missing rep incurs a 15-second penalty.", "Using powdered chalk results in a 2-minute penalty.", "Leaving the station before 100 valid reps: 15-second penalty per missing rep."],
             tips: ["Drop into a full squat below parallel, then drive up and throw.", "Aim for the centre of the target on every single rep.", "Catch the ball straight into your next squat to keep a flow."],
-            hasLoad: true, load: { men: "6 kg → 3.0 m", women: "4 kg → 2.7 m" }
+            hasLoad: true, load: { men: "6 kg → 3 m", women: "4 kg → 2.7 m" }
           },
         ],
         zh: [
@@ -280,8 +280,12 @@
           '<button data-action="setZh" data-langbtn="zh" style="border:none;font-family:\'Noto Sans SC\',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.04em;padding:9px 14px;cursor:pointer;background:transparent;color:var(--text-secondary);">中文</button>' +
           '</div>' +
           '<div data-theme="' + state.theme + '" style="display:flex;gap:3px;background:var(--switch-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--switch-border);padding:3px;">' +
-          '<button data-action="setLight" data-themebtn="light" style="border:none;font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.08em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">' + esc(t.light) + '</button>' +
-          '<button data-action="setDark" data-themebtn="dark" style="border:none;font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:800;font-size:12px;letter-spacing:0.08em;padding:9px 14px;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--text-secondary);">' + esc(t.dark) + '</button>' +
+          '<button data-action="setLight" data-themebtn="light" aria-label="' + esc(t.light) + '" style="border:none;display:flex;align-items:center;justify-content:center;padding:9px 12px;cursor:pointer;background:transparent;color:var(--text-secondary);">' +
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line></svg>' +
+          '</button>' +
+          '<button data-action="setDark" data-themebtn="dark" aria-label="' + esc(t.dark) + '" style="border:none;display:flex;align-items:center;justify-content:center;padding:9px 12px;cursor:pointer;background:transparent;color:var(--text-secondary);">' +
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' +
+          '</button>' +
           '</div>' +
           '</div>';
       }
@@ -296,20 +300,6 @@
           '</div>' +
           '<h1 style="font-family:\'Anton\',\'Noto Sans SC\',sans-serif;font-weight:400;font-size:clamp(60px,11vw,150px);line-height:0.86;letter-spacing:-0.005em;text-transform:uppercase;margin:0;color:var(--text-strong);">' + esc(t.heroA) + '<br><span style="color:var(--accent);">' + esc(t.heroB) + '</span></h1>' +
           '<p style="max-width:640px;font-size:clamp(17px,2vw,20px);line-height:1.55;color:var(--text-secondary);margin:32px 0 0;">' + esc(t.heroSub) + '</p>' +
-          '<div style="display:flex;flex-wrap:wrap;gap:0;margin-top:56px;border:1px solid var(--border);">' +
-          '<div style="flex:1;min-width:180px;padding:30px 32px;border-right:1px solid var(--border);">' +
-          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">8<span style="color:var(--accent);">KM</span></div>' +
-          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">' + esc(t.stat1) + '</div>' +
-          '</div>' +
-          '<div style="flex:1;min-width:180px;padding:30px 32px;border-right:1px solid var(--border);">' +
-          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">8</div>' +
-          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">' + esc(t.stat2) + '</div>' +
-          '</div>' +
-          '<div style="flex:1;min-width:180px;padding:30px 32px;">' +
-          '<div style="font-family:\'Anton\',sans-serif;font-size:clamp(46px,6vw,68px);line-height:1;color:var(--text-strong);">1</div>' +
-          '<div style="font-family:\'Inter\',\'Noto Sans SC\',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);margin-top:12px;">' + esc(t.stat3) + '</div>' +
-          '</div>' +
-          '</div>' +
           '</div>' +
           '</section>';
       }
