@@ -411,7 +411,7 @@
           '<div class="station-left" style="position:sticky;top:24px;">' +
           (s.videoFile ?
             '<div data-vidblock style="position:relative;width:100%;border:1px solid var(--border);overflow:hidden;background:#000;line-height:0;">' +
-            '<video src="' + esc(s.videoFile) + '#t=0.1" loop playsinline preload="metadata" style="width:100%;height:auto;display:block;"></video>' +
+            '<video src="' + esc(s.videoFile) + '" loop playsinline preload="metadata" style="width:100%;height:auto;display:block;"></video>' +
             videoControls() +
             '</div>'
             :
@@ -515,7 +515,17 @@
             if (fill) { fill.style.width = (d ? (video.currentTime / d * 100) : 0) + "%"; }
             if (time) { time.textContent = fmtTime(video.currentTime) + " / " + fmtTime(d); }
           }
-          video.addEventListener("loadedmetadata", sync);
+          // Prime the first frame: with preload="metadata" most browsers fetch
+          // metadata but never paint a frame, leaving the video black until play.
+          // Nudging currentTime forces a seek, which fetches and renders that frame.
+          var primed = false;
+          video.addEventListener("loadedmetadata", function () {
+            sync();
+            if (!primed) {
+              primed = true;
+              try { video.currentTime = 0.1; } catch (e) {}
+            }
+          });
           video.addEventListener("timeupdate", sync);
           video.addEventListener("play", function () { if (toggle) { toggle.innerHTML = ICON_PAUSE; } });
           video.addEventListener("pause", function () { if (toggle) { toggle.innerHTML = ICON_PLAY; } });
