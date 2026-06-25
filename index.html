@@ -636,6 +636,10 @@
           else if (act === "playpause") {
             if (video.paused) {
               loadVideo(video);
+              // The user explicitly pressed Play (a user gesture), so unmute and
+              // play with sound. The element stays muted by default so off-screen
+              // first-frame priming is never blocked by autoplay policies.
+              video.muted = false;
               var p = video.play();
               if (p && p.catch) { p.catch(function () {}); }
             } else { video.pause(); }
