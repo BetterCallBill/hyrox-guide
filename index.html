@@ -112,6 +112,24 @@
       // Videos are served from Cloudflare R2 (public dev URL).
       var VIDEO_BASE = "https://pub-624b079756ec4407976ac94842a3e765.r2.dev";
 
+      // Intrinsic "width / height" per clip, used to reserve the player's space
+      // up front so the layout never shifts — including while a video is lazily
+      // detached off-screen (a source-less <video> otherwise collapses).
+      var VIDEO_DIMS = {
+        "1-skierg.mp4": "720 / 1280",
+        "2-sled-push.mp4": "1178 / 1770",
+        "3-sled-pull.mp4": "720 / 1280",
+        "4-burpee.mp4": "720 / 1280",
+        "5-rowing.mp4": "720 / 1280",
+        "6-farmers-carry.mp4": "720 / 1280",
+        "7-sandbag-lunges.mp4": "720 / 1280",
+        "8-wall-balls.mp4": "1180 / 2556"
+      };
+      function vidRatio(file) {
+        var base = String(file).split("/").pop();
+        return VIDEO_DIMS[base] || "720 / 1280";
+      }
+
       var COPY = {
         en: {
           guideKicker: "The first-timer's guide to Hyrox",
@@ -410,8 +428,8 @@
 
           '<div class="station-left" style="position:sticky;top:24px;">' +
           (s.videoFile ?
-            '<div data-vidblock style="position:relative;width:100%;border:1px solid var(--border);overflow:hidden;background:#000;line-height:0;">' +
-            '<video data-src="' + esc(s.videoFile) + '" loop muted playsinline preload="none" style="width:100%;height:auto;display:block;"></video>' +
+            '<div data-vidblock style="position:relative;width:100%;aspect-ratio:' + vidRatio(s.videoFile) + ';border:1px solid var(--border);overflow:hidden;background:#000;line-height:0;">' +
+            '<video data-src="' + esc(s.videoFile) + '" loop muted playsinline preload="none" style="width:100%;height:100%;object-fit:cover;display:block;"></video>' +
             videoControls() +
             '</div>'
             :
@@ -549,6 +567,9 @@
           // again whenever the video is re-loaded after scrolling back into view.
           video.addEventListener("loadedmetadata", function () {
             sync();
+            if (video.videoWidth && video.videoHeight) {
+              block.style.aspectRatio = video.videoWidth + " / " + video.videoHeight;
+            }
             if (video.paused && video.currentTime < 0.1) {
               try { video.currentTime = 0.1; } catch (e) {}
             }
